@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7158732bf3fe1f14da42b89a1d897deb, type: 3}
+  m_Name: SpecialAlien
+  m_EditorClassIdentifier: 
+  alienType: 2
+  prefab: {fileID: 807050301993260267, guid: 71e7a3cacba3535438ad933d485bf848, type: 3}
+  health: 3
+  score: 15
+  damage: 2
+  minWaitTime: 1
+  maxWaitTime: 7
+  laserSpeed: 5
+  laserColor: {r: 1, g: 0.98929787, b: 0, a: 1}
