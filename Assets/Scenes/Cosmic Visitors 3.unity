@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   changingLevel: 0
-  levelNumber: 0
+  levelNumber: 1
   moveDelay: 1
   levels:
   - {fileID: 11400000, guid: 0b9fe7557c1d07e4bb55172050bf02a5, type: 2}

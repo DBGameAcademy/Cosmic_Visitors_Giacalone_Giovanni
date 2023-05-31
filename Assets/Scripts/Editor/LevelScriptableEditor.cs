@@ -25,20 +25,24 @@ public class LevelScriptableEditor : Editor
         level.Row3 = EditorGUILayout.TextField("ROW 3", level.Row3);
         level.Row4 = EditorGUILayout.TextField("ROW 4", level.Row4);
         level.Row5 = EditorGUILayout.TextField("ROW 5", level.Row5);
-        
-        EditorGUILayout.LabelField("ROW1 Characters 13/ ", level.Row1.Length.ToString());
-        
-        EditorGUILayout.LabelField("ROW2 Characters 13/ ", level.Row2.Length.ToString());
-        
-        EditorGUILayout.LabelField("ROW3 Characters 13/ ", level.Row3.Length.ToString());
-        
-        EditorGUILayout.LabelField("ROW4 Characters 13/ ", level.Row4.Length.ToString());
-        
-        EditorGUILayout.LabelField("ROW5 Characters 13/ ", level.Row5.Length.ToString());
+
+        DrawLabelField("ROW1 Characters 13/ ", level.Row1);
+        DrawLabelField("ROW2 Characters 13/ ", level.Row2);
+        DrawLabelField("ROW3 Characters 13/ ", level.Row3);
+        DrawLabelField("ROW4 Characters 13/ ", level.Row4);
+        DrawLabelField("ROW5 Characters 13/ ", level.Row5);
 
         level.moveDelay = EditorGUILayout.Slider("Move Delay", level.moveDelay, 3, .8f);
 
-        EditorUtility.SetDirty(target);
+        EditorUtility.SetDirty(level);
+    }
+
+    private void DrawLabelField(string label, string rowData)
+    {
+        if (string.IsNullOrEmpty(rowData))
+            return;
+
+        EditorGUILayout.LabelField(label, rowData.Length.ToString());
     }
 
     private void DisplayErrorMessage(int _nChar)
