@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class EventManager : MonoBehaviour
+public class EventManager
 {
     // Dictionary that will contain all of the events
     private Dictionary<string, UnityEvent> eventDictionary;
@@ -14,18 +14,11 @@ public class EventManager : MonoBehaviour
     {
         get
         {
-            if (!eventManager)
+            if (eventManager == null)
             {
-                eventManager = FindObjectOfType(typeof(EventManager)) as EventManager;
+                eventManager = new EventManager();
 
-                if (!eventManager)
-                {
-                    Debug.LogError("No event manager in the scene");
-                }
-                else
-                {
-                    eventManager.Init();
-                }
+                eventManager.Init();
             }
             return eventManager;
         }

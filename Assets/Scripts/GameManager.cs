@@ -7,13 +7,28 @@ public class GameManager : Helper.MonoSingleton<GameManager>
     public enum eGameState { Idle, Start, Playing, ResetLevel, ChangeLevel, Win, Gameover}
     public eGameState gameState;
 
+    private List<GameObject> laserInScene = new List<GameObject>();
+
     private void OnEnable()
     {
         EventManager.Instance.StartListening("OnLevelBuilt", PlayGame);
         EventManager.Instance.StartListening("OnPlayerDead", GameOver);
+        EventManager.Instance.StartListening("OnPlayerDead", RemoveLaserFromScene);
         EventManager.Instance.StartListening("OnLevelCompleted", ResetLevel);
+        EventManager.Instance.StartListening("OnLevelCompleted", RemoveLaserFromScene);
         EventManager.Instance.StartListening("OnPlayerReset", ChangeLevel);
         EventManager.Instance.StartListening("OnPlayerWin", Win);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.Instance.StopListening("OnLevelBuilt", PlayGame);
+        EventManager.Instance.StopListening("OnPlayerDead", GameOver);
+        EventManager.Instance.StopListening("OnPlayerDead", RemoveLaserFromScene);
+        EventManager.Instance.StopListening("OnLevelCompleted", ResetLevel);
+        EventManager.Instance.StopListening("OnLevelCompleted", RemoveLaserFromScene);
+        EventManager.Instance.StopListening("OnPlayerReset", ChangeLevel);
+        EventManager.Instance.StopListening("OnPlayerWin", Win);
     }
 
     protected override void Awake()
@@ -24,41 +39,17 @@ public class GameManager : Helper.MonoSingleton<GameManager>
 
     private void Update()
     {
-        Debug.Log(gameState);
 
         switch (gameState)
         {
-            case eGameState.Idle:
+            case eGameState.Win:
                 
-                if (Input.GetKeyDown(KeyCode.KeypadEnter))
+                if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    StartGame();
-                }
-
-                //here we show the title screen
-                
-                break;
-
-            case eGameState.Start:
-
-                break;
-
-            case eGameState.Playing:
-
-                break;
-
-            case eGameState.ChangeLevel:
-                if (Input.anyKeyDown)
-                {
-                    EventManager.Instance.TriggerEvent("OnChangeLevel");
+                    EventManager.Instance.TriggerEvent("OnGameEnd");
                 }
                 break;
         }
-    }
-
-    private void StartGame()
-    {
-        EventManager.Instance.TriggerEvent("OnGameStarted");
     }
 
     private void PlayGame()
@@ -84,5 +75,18 @@ public class GameManager : Helper.MonoSingleton<GameManager>
     private void ChangeLevel()
     {
         gameState = eGameState.ChangeLevel;
+    }
+
+    public void AddLaser(GameObject _laser)
+    {
+        laserInScene.Add(_laser);
+    }
+
+    private void RemoveLaserFromScene()
+    {
+        for (int i = laserInScene.Count - 1; i >= 0; i--)
+        {
+            LaserFactory.Instance.ReturnObject(laserInScene[i]);
+        }
     }
 }

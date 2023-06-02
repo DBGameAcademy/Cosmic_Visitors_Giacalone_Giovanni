@@ -101,6 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isPlaying: 0
   goingNextLevel: 0
+  particle: {fileID: 1184416729043517778, guid: dd5b25b35deaffc46bda948ee6df4849, type: 3}
 --- !u!50 &3437085600904151773
 Rigidbody2D:
   serializedVersion: 4

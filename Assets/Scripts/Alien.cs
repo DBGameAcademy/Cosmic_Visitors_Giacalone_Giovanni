@@ -6,14 +6,14 @@ public class Alien : MonoBehaviour, IPoolable
 {
     private int health;
     private int currentHealth;
-    public int score;
-    public float minWaitTime;
-    public float maxWaitTime;
-    public int laserDamage;
-    public float laserSpeed;
-    public Color laserColor;
+    private int score;
+    private float minWaitTime;
+    private float maxWaitTime;
+    private int laserDamage;
+    private float laserSpeed;
+    private Color laserColor;
     private bool hasFired;
-    public PolygonCollider2D polyCollider;
+    private PolygonCollider2D polyCollider;
     public float colliderSize;
     private bool isAlive;
     public bool IsAlive
@@ -22,12 +22,13 @@ public class Alien : MonoBehaviour, IPoolable
         set => isAlive = value;
     }
 
+    private Color originalColor;
+
     private void Awake()
     {
         hasFired = true;
         polyCollider = GetComponent<PolygonCollider2D>();
         colliderSize = polyCollider.bounds.size.x / 2;
-        Invoke("StartFire", Random.Range(2, 10));
         originalColor = GetComponent<SpriteRenderer>().color;
     }
 
@@ -52,6 +53,8 @@ public class Alien : MonoBehaviour, IPoolable
         laserDamage = _prototype.damage;
         laserSpeed = _prototype.laserSpeed;
         laserColor = _prototype.laserColor;
+        hasFired = false;
+        SetSpriteColor(originalColor);
     }
 
     IEnumerator FireCoroutine(float _minWaitTime, float _maxWaitTime)
@@ -60,18 +63,12 @@ public class Alien : MonoBehaviour, IPoolable
         Vector3 position = new Vector3(transform.position.x, transform.position.y - 1.5f, transform.position.z);
         GameObject laser = LaserFactory.Instance.CreateObject("Laser", position, Quaternion.identity);
         
-        // this should be handled with an event callback that can pass parameters
         laser.GetComponent<Laser>().damage = laserDamage;
         laser.GetComponent<Laser>().speed = laserSpeed;
         laser.GetComponent<SpriteRenderer>().color = laserColor;
-        
-        // add laser in a list (?)
+        GameManager.Instance.AddLaser(laser); 
+       
         yield return new WaitForSeconds(Random.Range(_minWaitTime, _maxWaitTime));
-        hasFired = false;
-    }
-
-    private void StartFire()
-    {
         hasFired = false;
     }
 
@@ -89,19 +86,13 @@ public class Alien : MonoBehaviour, IPoolable
         {
             ManageCollection(this);
             IsAlive = false;
-            // update the score
-            // instantiate the particle effect
+            UIManager.Instance.UpdateScore(score);
         }
     }
 
     private void ManageCollection(Alien _alien)
     {
         AlienManager.Instance.aliensInGame.Remove(_alien);
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        EventManager.Instance.TriggerEvent("OnCollisionHappened");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -113,7 +104,6 @@ public class Alien : MonoBehaviour, IPoolable
         }
     }
 
-    private Color originalColor;
 
     private void SetSpriteColor(Color _color)
     {

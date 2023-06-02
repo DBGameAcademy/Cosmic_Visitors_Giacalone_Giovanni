@@ -5,31 +5,39 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private int speed;
-    private int health;
+    public int health = 15;
+    public int Health { get { return health; } }
     private int currentHealth;
     public int CurrentHealth { get { return currentHealth; } }
-    public bool isPlaying = false;
-    public bool goingNextLevel;
-    //private bool particlePlayed;
-    //private bool hasFired;
+    //public bool isPlaying = false;
+    private bool goingNextLevel;
+
+    [SerializeField] private ParticleSystem particle;
+    private ParticleSystem particleObj;
+    private bool particlePlayed;
+
+    private bool hasFired;
     private float fireCooldown;
+
+    public int damage = 1;
 
     private void Awake()
     {
         speed = 7;
-        health = 5;
+        //health = 15;
         currentHealth = health;
-        //UIManager.Instance.UpdateLifes(currentHealth);
+
+        UIManager.Instance.UpdateHealth(health, currentHealth);
+        
         fireCooldown = .7f;
-        isPlaying = true;
+        //isPlaying = true;
         goingNextLevel = true;
-        //particlePlayed = false;
-        //hasFired = false;
+        particlePlayed = false;
+        hasFired = false;
     }
 
     private void OnEnable()
     {
-        //EventManager.Instance.StartListening("OnLevelCompleted", InvokeReset);
     }
 
     private void Update()
@@ -37,7 +45,20 @@ public class Player : MonoBehaviour
         if (GameManager.Instance.gameState == GameManager.eGameState.Playing)
         {
             goingNextLevel = true;
-            Fire();
+            if (!hasFired)
+            {
+                Fire();
+            }
+        }
+        else if (GameManager.Instance.gameState == GameManager.eGameState.ResetLevel)
+        {
+            if (!particlePlayed)
+            {
+                particleObj = Instantiate(particle, transform.position - new Vector3(0, .5f, 0), transform.rotation * Quaternion.Euler(90,0,0));
+                particleObj.transform.SetParent(transform);
+                particlePlayed = true;
+                hasFired = false;
+            }
         }
     }
 
@@ -57,7 +78,7 @@ public class Player : MonoBehaviour
     {
         float bound = 8.387501f;
         float hInput = Input.GetAxis("Horizontal");
-        transform.Translate(Vector3.right * speed * hInput * Time.deltaTime);
+        transform.Translate(Vector3.right * speed * hInput * Time.fixedDeltaTime);
         if (transform.position.x > bound)
         {
             transform.position = new Vector3(bound, transform.position.y, transform.position.z);
@@ -73,13 +94,13 @@ public class Player : MonoBehaviour
 
         while (transform.position.y < 7 && goingNextLevel)
         {
-            transform.Translate(Vector3.up * Time.deltaTime * speed * 10);
+            transform.Translate(Vector3.up * Time.fixedDeltaTime * speed * 2);
             return;
         }
 
-        //particlePlayed = false;
-        //Destroy(particle);
-        transform.position = new Vector3(0, -4.5f, 0);
+        particlePlayed = false;
+        Destroy(particleObj);
+        transform.position = new Vector3(0, -4f, 0);
         goingNextLevel = false;
 
         EventManager.Instance.TriggerEvent("OnPlayerReset");
@@ -93,7 +114,8 @@ public class Player : MonoBehaviour
         }
 
         currentHealth -= _damage;
-        //UIManager.Instance.UpdateLifes(currentHealth);
+        UIManager.Instance.UpdateHealth(health, currentHealth);
+        EventManager.Instance.TriggerEvent("OnPlayerHit");
 
         if (currentHealth <= 0)
         {
@@ -104,20 +126,19 @@ public class Player : MonoBehaviour
 
     private void Fire()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Vector3 position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
-            GameObject laser = LaserFactory.Instance.CreateObject("PlayerLaser", position, Quaternion.identity);
-            laser.GetComponent<Laser>().damage = 1;
-            laser.GetComponent<Laser>().speed = 10;
-            // add laser in a list (?)
-        }
+        hasFired = true;
+        Vector3 position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
+        GameObject laser = LaserFactory.Instance.CreateObject("PlayerLaser", position, Quaternion.identity);
+        laser.GetComponent<Laser>().damage = damage;
+        laser.GetComponent<Laser>().speed = 10;
+        GameManager.Instance.AddLaser(laser);
+        StartCoroutine(ResetFireCoroutine());
     }
 
     IEnumerator ResetFireCoroutine()
     {
         yield return new WaitForSeconds(fireCooldown);
-        //hasFired = false;
+        hasFired = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

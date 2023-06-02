@@ -10,53 +10,61 @@ public class AlienManager : Helper.MonoSingleton<AlienManager>
     public float downSpace;
     public float moveDelay;
     private bool canMove = true;
-    [SerializeField]
     private bool goingRight = true;
     public Alien alienMostRight;
     public Alien alienMostLeft;
 
     private void OnEnable()
     {
-        EventManager.Instance.StartListening("OnCollisionHappened", ChangeDirection);
+        EventManager.Instance.StartListening("OnPlayerDead", RemoveAliensFromScene);
+        EventManager.Instance.StartListening("OnLevelBuilt", SetupLevel);
+        EventManager.Instance.StartListening("OnLevelCompleted", RemoveAliensFromScene);
+    }
+    
+    private void OnDisable()
+    {
+        EventManager.Instance.StopListening("OnPlayerDead", RemoveAliensFromScene);
+        EventManager.Instance.StopListening("OnLevelBuilt", SetupLevel);
+        EventManager.Instance.StopListening("OnLevelCompleted", RemoveAliensFromScene);
     }
 
     private void Start()
     {
         alienMostRight = null;
         alienMostLeft = null;
-        SetupLevel();
     }
 
     private void Update()
     {
         if (GameManager.Instance.gameState == GameManager.eGameState.Playing)
         {
+            FindMostRightAndLeftAlien();
             Move();
             if (aliensInGame.Count == 0)
             {
                 EventManager.Instance.TriggerEvent("OnLevelCompleted");
+
             }
+            
         }
-
     }
 
-    private void OnDisable()
-    {
-        EventManager.Instance.StopListening("OnCollisionHappened", ChangeDirection);
-    }
 
     public void SetupLevel()
     {
+        StopAllCoroutines();
+        canMove = false;
+        alienMostLeft = null;
+        alienMostRight = null;
+        descendingIndex = 0;
+        Invoke("ResetCanMove", 1.5f);
+        goingRight = true;
         moveDelay = LevelManager.Instance.moveDelay;
-        if (moveDelay <= .8f)
-        {
-            moveDelay = .8f;
-        }
     }
     
     private void Move()
     {
-        FindMostRightAndLeftAlien();
+        //FindMostRightAndLeftAlien();
         
         if (canMove)
         {
@@ -114,6 +122,8 @@ public class AlienManager : Helper.MonoSingleton<AlienManager>
         canMove = true;
     }
 
+    private void ResetCanMove() => canMove = true;
+
     public void ChangeDirection()
     {
         goingRight = goingRight ? false : true;
@@ -125,17 +135,18 @@ public class AlienManager : Helper.MonoSingleton<AlienManager>
     {
         float maxX = -Mathf.Infinity;
         float minX = -Mathf.Infinity;
+
         for (int i = aliensInGame.Count - 1; i >= 0; i--)
         {
             float x = aliensInGame[i].transform.position.x;
-            if (x > maxX)
+            if (x >= maxX)
             {
                 maxX = x;
                 alienMostRight = aliensInGame[i];
             }
             
             float y = aliensInGame[i].transform.position.x;
-            if (y < -minX)
+            if (y <= -minX)
             {
                 minX = y;
                 alienMostLeft = aliensInGame[i];
@@ -168,6 +179,14 @@ public class AlienManager : Helper.MonoSingleton<AlienManager>
         else
         {
             return false;
+        }
+    }
+
+    private void RemoveAliensFromScene()
+    {
+        for (int i = aliensInGame.Count - 1; i >= 0; i--)
+        {
+            aliensInGame[i].IsAlive = false;
         }
     }
 }

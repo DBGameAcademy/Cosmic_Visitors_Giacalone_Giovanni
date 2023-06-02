@@ -21,36 +21,47 @@ public class LevelScriptableEditor : Editor
         EditorGUILayout.HelpBox(guiMessage);
         
         level.Row1 = EditorGUILayout.TextField("ROW 1", level.Row1);
-        level.Row2 = EditorGUILayout.TextField("ROW 2", level.Row2);
-        level.Row3 = EditorGUILayout.TextField("ROW 3", level.Row3);
-        level.Row4 = EditorGUILayout.TextField("ROW 4", level.Row4);
-        level.Row5 = EditorGUILayout.TextField("ROW 5", level.Row5);
-
         DrawLabelField("ROW1 Characters 13/ ", level.Row1);
+        DisplayErrorMessage(level.Row1);
+        
+        level.Row2 = EditorGUILayout.TextField("ROW 2", level.Row2);
         DrawLabelField("ROW2 Characters 13/ ", level.Row2);
+        DisplayErrorMessage(level.Row2);
+
+        level.Row3 = EditorGUILayout.TextField("ROW 3", level.Row3);
         DrawLabelField("ROW3 Characters 13/ ", level.Row3);
+        DisplayErrorMessage(level.Row3);
+
+        level.Row4 = EditorGUILayout.TextField("ROW 4", level.Row4);
         DrawLabelField("ROW4 Characters 13/ ", level.Row4);
+        DisplayErrorMessage(level.Row4);
+
+        level.Row5 = EditorGUILayout.TextField("ROW 5", level.Row5);
         DrawLabelField("ROW5 Characters 13/ ", level.Row5);
+        DisplayErrorMessage(level.Row5);
 
         level.moveDelay = EditorGUILayout.Slider("Move Delay", level.moveDelay, 3, .8f);
 
         EditorUtility.SetDirty(level);
     }
 
-    private void DrawLabelField(string label, string rowData)
+    private void DrawLabelField(string _label, string _rowData)
     {
-        if (string.IsNullOrEmpty(rowData))
+        if (string.IsNullOrEmpty(_rowData))
             return;
 
-        EditorGUILayout.LabelField(label, rowData.Length.ToString());
+        EditorGUILayout.LabelField(_label, _rowData.Length.ToString());
     }
 
-    private void DisplayErrorMessage(int _nChar)
+    private void DisplayErrorMessage(string _rowData)
     {
         GUIStyle errorGUIStyle = new GUIStyle();
         errorGUIStyle.normal.textColor = Color.red;
 
-        if (_nChar != 13)
+        if (string.IsNullOrEmpty(_rowData))
+            return;
+
+        if (_rowData.Length != 13)
         {
             EditorGUILayout.LabelField("PUT EXACTLY 13 CHARACTERS!!!", errorGUIStyle);
         }

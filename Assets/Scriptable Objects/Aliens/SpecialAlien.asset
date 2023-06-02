@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   alienType: 2
   prefab: {fileID: 807050301993260267, guid: 71e7a3cacba3535438ad933d485bf848, type: 3}
-  health: 3
+  health: 2
   score: 15
   damage: 2
   minWaitTime: 1

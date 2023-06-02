@@ -38,6 +38,7 @@ public class AlienFactory : Helper.MonoSingleton<AlienFactory>
         Alien alien = pool[0];
         alien.gameObject.SetActive(true);
         alien.IsAlive = true;
+        alien.SetUp(alienDictionary[alien]);
 
         pool.Remove(alien);
         currentlyActive.Add(alien);

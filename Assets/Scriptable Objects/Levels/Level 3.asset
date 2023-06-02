@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21afd766f4379954b9db0a4cadd13dbd, type: 3}
   m_Name: Level 3
   m_EditorClassIdentifier: 
-  levelNumber: 0
-  moveDelay: 1
-  row1: 
-  row2: 
-  row3: 
-  row4: 
-  row5: 
+  levelNumber: 3
+  moveDelay: 1.15
+  row1: --#-#-#-#-#--
+  row2: ---#--#--#---
+  row3: ---#--#--#---
+  row4: ----#-#-#----
+  row5: -------------

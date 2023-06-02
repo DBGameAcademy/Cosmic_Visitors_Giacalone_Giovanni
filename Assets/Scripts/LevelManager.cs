@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LevelManager : Helper.MonoSingleton<LevelManager>
 {
-    public bool changingLevel;
+    //public bool changingLevel;
     public int levelNumber;
     public float moveDelay;
     
@@ -23,13 +23,21 @@ public class LevelManager : Helper.MonoSingleton<LevelManager>
     private void OnEnable()
     {
         EventManager.Instance.StartListening("OnGameStarted", BuildLevel);
-        EventManager.Instance.StartListening("OnGameStarted", SpawnPlayer);
+        EventManager.Instance.StartListening("OnOpeningStarted", SpawnPlayer);
         EventManager.Instance.StartListening("OnChangeLevel", GoToNextLevel);
     }
-    
+
+    private void OnDisable()
+    {
+        EventManager.Instance.StopListening("OnGameStarted", BuildLevel);
+        EventManager.Instance.StopListening("OnOpeningStarted", SpawnPlayer);
+        EventManager.Instance.StopListening("OnChangeLevel", GoToNextLevel);
+    }
+
     private void Start()
     {
         levelNumber = 1;
+        UIManager.Instance.UpdateLevelNumber(levelNumber);
     }
 
     public void BuildLevel()
@@ -112,7 +120,7 @@ public class LevelManager : Helper.MonoSingleton<LevelManager>
                 break;
         }
 
-        // maybe this should a triggere event that the alien manager listens to and set up the moveDelay consequently (?)
+        
         AlienManager.Instance.SetupLevel();
     }
 
@@ -124,15 +132,17 @@ public class LevelManager : Helper.MonoSingleton<LevelManager>
     private void GoToNextLevel()
     {
         levelNumber++;
-        if (levelNumber <= 5)
+        UIManager.Instance.UpdateLevelNumber(levelNumber);
+        if (levelNumber < levels.Count)
         {
             BuildLevel();
         }
-        else if (levelNumber % 5 == 0)
+        else if (levelNumber == levels.Count)
         {
-            // here we create the boss
+            BuildLevel();
+            EventManager.Instance.TriggerEvent("OnFinalLevelEntered");
         }
-        else if (levelNumber >= 6)
+        else if (levelNumber > levels.Count)
         {
             EventManager.Instance.TriggerEvent("OnPlayerWin");
         }
