@@ -44,7 +44,7 @@ public class GameManager : Helper.MonoSingleton<GameManager>
         {
             case eGameState.Win:
                 
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (Input.GetKeyDown(KeyCode.Escape))
                 {
                     EventManager.Instance.TriggerEvent("OnGameEnd");
                 }

@@ -40,6 +40,14 @@ public class AlienManager : Helper.MonoSingleton<AlienManager>
         {
             FindMostRightAndLeftAlien();
             Move();
+            foreach (Alien alien in aliensInGame)
+            {
+                if (alien.transform.position.y <= -3)
+                {
+                    EventManager.Instance.TriggerEvent("OnPlayerDead");
+                }
+            }
+            
             if (aliensInGame.Count == 0)
             {
                 EventManager.Instance.TriggerEvent("OnLevelCompleted");

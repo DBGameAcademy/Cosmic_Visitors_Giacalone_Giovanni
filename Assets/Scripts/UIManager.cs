@@ -246,10 +246,12 @@ public class UIManager : Helper.MonoSingleton<UIManager>
         if (instructionsPanel.activeSelf)
         {
             instructionsPanel.SetActive(false);
+            bestiaryButton.SetActive(true);
         }
         else if (!instructionsPanel.activeSelf)
         {
             instructionsPanel.SetActive(true);
+            bestiaryButton.SetActive(false);
         }
         
         TitleScreen();
@@ -262,7 +264,7 @@ public class UIManager : Helper.MonoSingleton<UIManager>
             bestiary.SetActive(false);
             titleScreen.SetActive(true);
             instructionsButton.SetActive(true);
-            planet.SetActive(false);
+            planet.SetActive(true);
         }
         else if (!bestiary.activeSelf)
         {
